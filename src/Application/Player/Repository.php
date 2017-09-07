@@ -41,16 +41,18 @@ class Repository implements \BoundedContext\Contracts\Player\Repository
     {
         $snapshot = $this->snapshot_repository->get($class_name);
 
-         // by default, the player version should be 0, not 1
-         // for already existing players at version 1, we will have a snapshot that will tell us the version is 1 and this method will return false
-         // for new players without a snapshot the static method ::version() will return 1 so this method returns true
-         $active_version = new Integer_(0);
-         if ($snapshot) {
-             $active_version = $snapshot->playerVersion();
-         }
+        $default_version = $this->defaultVersion();
+        if ($snapshot) {
+            $default_version = $snapshot->playerVersion();
+        }
 
         $player_class = $class_name->value();
 
-        return $active_version->value() != $player_class::version();
+        return $default_version->value() != $player_class::version();
+    }
+
+    private function defaultVersion()
+    {
+        return new Integer_(0);
     }
 }
